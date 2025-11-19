@@ -47,9 +47,6 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
 
         <div className="flex flex-wrap gap-4 text-sm text-neutral-600">
           <span>Owner: {project.owner?.name ?? "Unknown"}</span>
-          {project.organization && (
-            <span>Organization: {project.organization.name}</span>
-          )}
           <span>
             Created at:{" "}
             {project.createdAt.toLocaleDateString("en-GB")}
