@@ -129,7 +129,7 @@ export default async function HomePage() {
                     {p.title}
                   </p>
                   <p className="mt-2 line-clamp-3 text-xs text-slate-600">
-                    {p.excerpt ?? p.description ?? ""}
+                    {p.summary ?? ""}
                   </p>
                   <span className="mt-3 text-xs text-slate-400">
                     {p.country ? p.country : "Unknown location"}
