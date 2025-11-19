@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  password  String?
+  createdAt DateTime  @default(now())
+  projects  Project[]
+  events    Event[]   @relation("UserEvents")
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  title     String
+  summary   String?
+  tags      String[]
+  stars     Int      @default(0)
+  ownerId   String
+  createdAt DateTime @default(now())
+  owner     User     @relation(fields: [ownerId], references: [id])
+}
+
+model Thread {
+  id    String   @id @default(cuid())
+  title String
+  body  String
+  tags  String[]
+
+  replies Int @default(0)
+  likes   Int @default(0) // 👈 برای لایک‌ها
+
+  createdAt DateTime @default(now())
+
+  // رابطه با ریپلای‌ها (اسمش مهم نیست، فقط یک لیست است)
+  repliesList Reply[]
+}
+
+model Reply {
+  id       String @id @default(cuid())
+  threadId String
+  thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  author    String
+  role      String?
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime
+  endDate     DateTime?
+  location    String?
+  country     String?
+  url         String?
+
+  createdAt DateTime @default(now())
+
+  // ...
+
+  // ✅ سازمان برگزارکننده (که قبلاً گفتیم)
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
+
+  // ✅ کاربری که این event را ساخته
+  createdBy   User?   @relation("UserEvents", fields: [createdById], references: [id])
+  createdById String?
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  country   String?
+  website   String?
+  createdAt DateTime @default(now())
+
+  // رابطه معکوس با Event
+  events Event[]
+}
