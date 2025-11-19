@@ -124,12 +124,6 @@ export default async function ProjectsPage({ searchParams }: Props) {
               )}
 
               <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
-                <span>
-                  {(project as any).location
-                    ? `${(project as any).location}, `
-                    : ""}
-                  {project.country}
-                </span>
                 <span className="text-emerald-700 font-medium">
                   View details →
                 </span>
