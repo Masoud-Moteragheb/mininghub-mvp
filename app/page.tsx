@@ -192,9 +192,6 @@ export default async function HomePage() {
                   <p className="line-clamp-2 text-sm font-semibold text-slate-900">
                     {e.title}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {formatEventDate(e.date)} • {e.country ?? "TBA"}
-                  </p>
                   <p className="mt-2 line-clamp-3 text-xs text-slate-600">
                     {e.description ?? ""}
                   </p>

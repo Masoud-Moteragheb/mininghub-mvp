@@ -2,17 +2,26 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(
-  req: Request,
-  ctx: { params: Promise<{ id: string }> }
-) {
-  const { id } = await ctx.params;
+type Params = { params: { id: string } };
 
-  const updated = await prisma.thread.update({
-    where: { id },
-    data: { likes: { increment: 1 } },
-    select: { likes: true },
-  });
+// POST /api/community/[id]/like  → افزایش لایک
+export async function POST(_req: Request, { params }: Params) {
+  const { id } = params;
 
-  return NextResponse.json({ likes: updated.likes });
+  try {
+    const updated = await prisma.thread.update({
+      where: { id },
+      data: {
+        likes: { increment: 1 },
+      },
+    });
+
+    return NextResponse.json({ likes: updated.likes ?? 0 });
+  } catch (err) {
+    console.error("POST /api/community/[id]/like failed", err);
+    return NextResponse.json(
+      { error: "Failed to like post" },
+      { status: 500 }
+    );
+  }
 }

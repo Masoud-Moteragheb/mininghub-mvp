@@ -33,7 +33,7 @@ export default function CommunityThreadClient({ post, initialReplies }: Props) {
       });
       if (!res.ok) return;
       const data = await res.json();
-      setLikes(data.likes);
+      setLikes(data.likes ?? 0);
     } catch (e) {
       console.error("Failed to like post", e);
     }
@@ -114,7 +114,7 @@ export default function CommunityThreadClient({ post, initialReplies }: Props) {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setLikes((v) => v + 1)}
+              onClick={handleLike}
               className="inline-flex items-center gap-1 rounded-full bg-neutral-50 px-3 py-1 text-[11px] text-neutral-600 hover:bg-emerald-50 hover:text-emerald-800"
             >
               <span>👍</span>

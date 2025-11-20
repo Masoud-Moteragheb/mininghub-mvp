@@ -1,50 +1,140 @@
 // app/api/community/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import type { CommunityItem } from "@/app/community/page";
 
-function mapThreadToCommunityItem(thread: any): CommunityItem {
-  const firstTag = (thread.tags?.[0] as string | undefined) ?? "Q&A";
+/** کمک برای اینکه رشته‌های tags را به فیلدهای قابل‌استفاده تبدیل کنیم */
+function mapThreadToCommunityItem(thread: any) {
+  // پیش‌فرض‌ها
+  let tag: "Q&A" | "Case Study" | "News" | "Job" = "Q&A";
+  let mine: string | undefined;
+  let mineType: string | undefined;
+  let country: string | undefined;
+  let commodity: string | undefined;
+
+  if (Array.isArray(thread.tags)) {
+    for (const t of thread.tags as string[]) {
+      const [key, ...rest] = t.split(":");
+      const value = rest.join(":").trim();
+      if (!value) continue;
+
+      switch (key) {
+        case "tag":
+          if (
+            value === "Q&A" ||
+            value === "Case Study" ||
+            value === "News" ||
+            value === "Job"
+          ) {
+            tag = value;
+          }
+          break;
+        case "mine":
+          mine = value;
+          break;
+        case "mineType":
+          mineType = value;
+          break;
+        case "country":
+          country = value;
+          break;
+        case "commodity":
+          commodity = value;
+          break;
+      }
+    }
+  }
 
   return {
-    id: thread.id,
-    title: thread.title,
-    excerpt: thread.body,
-    tag: firstTag as CommunityItem["tag"],
-
-    mine: undefined,
-    mineType: undefined,
-    country: undefined,
-    commodity: undefined,
-
+    id: thread.id as string,
+    title: thread.title as string,
+    excerpt: (thread.body as string) ?? "",
+    tag,
+    mine,
+    mineType,
+    country,
+    commodity,
+    // چون در مدل دیتابیس author و role نداریم، فعلاً ثابت می‌گذاریم
     author: "Demo User",
     role: "Community member",
-    createdAt: thread.createdAt.toISOString(),
-    replies: thread.replies ?? 0,
-    likes: thread.likes ?? 0, // 👈 حالا مقدار واقعی
+    createdAt: (thread.createdAt as Date).toISOString(),
+    replies: (thread.replies as number) ?? 0,
+    likes: (thread.likes as number) ?? 0,
   };
 }
 
+// GET /api/community  → لیست پست‌ها
 export async function GET() {
-  const threads = await prisma.thread.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    const threads = await prisma.thread.findMany({
+      orderBy: { createdAt: "desc" },
+    });
 
-  const items = threads.map(mapThreadToCommunityItem);
-  return NextResponse.json(items);
+    const items = threads.map(mapThreadToCommunityItem);
+    return NextResponse.json(items);
+  } catch (err) {
+    console.error("GET /api/community failed", err);
+    return NextResponse.json(
+      { error: "Failed to load community posts" },
+      { status: 500 }
+    );
+  }
 }
 
+// POST /api/community  → ساخت پست جدید
 export async function POST(req: Request) {
-  const body = await req.json();
+  try {
+    const body = await req.json();
 
-  const thread = await prisma.thread.create({
-    data: {
-      title: body.title,
-      body: body.excerpt ?? body.body ?? "",
-      tags: [body.tag],
-    },
-  });
+    const {
+      title,
+      body: text,
+      tag,
+      mine,
+      mineType,
+      country,
+      commodity,
+    } = body as {
+      title: string;
+      body: string;
+      tag: "Q&A" | "Case Study" | "News" | "Job";
+      mine?: string | null;
+      mineType?: string | null;
+      country?: string | null;
+      commodity?: string | null;
+    };
 
-  const item = mapThreadToCommunityItem(thread);
-  return NextResponse.json(item, { status: 201 });
+    if (!title || !text) {
+      return NextResponse.json(
+        { error: "Title and body are required" },
+        { status: 400 }
+      );
+    }
+
+    // tags را به صورت key:value ذخیره می‌کنیم تا بعداً بتوانیم دوباره بخوانیم
+    const tags: string[] = [];
+    if (tag) tags.push(`tag:${tag}`);
+    if (mine) tags.push(`mine:${mine}`);
+    if (mineType) tags.push(`mineType:${mineType}`);
+    if (country) tags.push(`country:${country}`);
+    if (commodity) tags.push(`commodity:${commodity}`);
+
+    const thread = await prisma.thread.create({
+      data: {
+        title,
+        body: text,
+        tags,
+        likes: 0,
+        replies: 0,
+      },
+    });
+
+    const item = mapThreadToCommunityItem(thread);
+    return NextResponse.json(item, { status: 201 });
+  } catch (err) {
+    console.error("POST /api/community failed", err);
+    return NextResponse.json(
+      { error: "Failed to create post" },
+      { status: 500 }
+    );
+  }
 }
