@@ -1,7 +1,16 @@
 // app/page.tsx
 import Link from "next/link";
-import { CalendarDays, FolderKanban, MessageCircle, ArrowRight } from "lucide-react";
-import { prisma } from "@/lib/prisma"; // مسیر را مطابق پروژه خودت تنظیم کن
+import {
+  CalendarDays,
+  FolderKanban,
+  MessageCircle,
+  ArrowRight,
+} from "lucide-react";
+import type { ReactNode } from "react";
+import { prisma } from "@/lib/prisma";
+
+// این خط باعث می‌شود صفحه همیشه دیتای تازه از دیتابیس بگیرد
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   // آمار کلی
@@ -40,9 +49,9 @@ export default async function HomePage() {
               Welcome to <span className="text-emerald-700">MiningHub</span>
             </h1>
             <p className="text-slate-700">
-              Showcase mining projects, share real-world experiences on mine water and
-              hydrogeology, and collaborate with engineers, researchers, and companies
-              in one professional space.
+              Showcase mining projects, share real-world experiences on mine
+              water and hydrogeology, and collaborate with engineers,
+              researchers, and companies in one professional space.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
@@ -192,6 +201,9 @@ export default async function HomePage() {
                   <p className="line-clamp-2 text-sm font-semibold text-slate-900">
                     {e.title}
                   </p>
+                  <p className="mt-1 text-[11px] text-slate-500">
+                    {e.date ? formatEventDate(e.date) : "Date TBD"}
+                  </p>
                   <p className="mt-2 line-clamp-3 text-xs text-slate-600">
                     {e.description ?? ""}
                   </p>
@@ -234,7 +246,7 @@ function SummaryCard({
   href,
   linkLabel,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   description: string;
   href: string;

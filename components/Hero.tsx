@@ -1,8 +1,19 @@
-'use client';
+// components/Hero.tsx
+"use client";
 
 import { motion } from "framer-motion";
 
-export default function Hero() {
+type HeroStats = {
+  projects: number;
+  discussions: number;
+  events: number;
+};
+
+type HeroProps = {
+  stats: HeroStats;
+};
+
+export default function Hero({ stats }: HeroProps) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 10 }}
@@ -12,22 +23,20 @@ export default function Hero() {
     >
       <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
         <div>
-          <h3 className="text-2xl md:text-3xl font-semibold text-emerald-800">Welcome to MiningHub</h3>
+          <h3 className="text-2xl md:text-3xl font-semibold text-emerald-800">
+            Welcome to MiningHub
+          </h3>
           <p className="mt-2 max-w-2xl text-sm md:text-base text-neutral-700">
-            Showcase mining projects, exchange best practices on mine water & hydrogeology,
-            and collaborate on research — all in one professional space.
+            Showcase mining projects, share real-world experiences on mine water
+            and hydrogeology, and collaborate with engineers, researchers, and
+            companies in one professional space.
           </p>
-          <div className="mt-4 flex items-center gap-2">
-            <button className="rounded-xl bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800">Browse Projects</button>
-            <button className="rounded-xl border px-3 py-2 text-sm hover:bg-neutral-50">Read Guidelines</button>
-          </div>
         </div>
-        <div className="rounded-2xl border bg-white p-4">
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <MiniStat kpi="+64" label="New projects" />
-            <MiniStat kpi="+310" label="New members" />
-            <MiniStat kpi="98%" label="Uptime" />
-          </div>
+
+        <div className="grid grid-cols-3 gap-3 text-sm">
+          <MiniStat kpi={String(stats.projects)} label="Projects" />
+          <MiniStat kpi={String(stats.discussions)} label="Discussions" />
+          <MiniStat kpi={String(stats.events)} label="Events" />
         </div>
       </div>
     </motion.section>
