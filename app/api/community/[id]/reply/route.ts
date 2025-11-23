@@ -2,13 +2,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-type Params = { params: { id: string } };
-
-// POST /api/community/[id]/reply  → اضافه کردن پاسخ
-export async function POST(req: Request, { params }: Params) {
-  const { id } = params;
-
+// در Next.js 16، context.params یک Promise است
+export async function POST(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await context.params;
+
     const { body } = (await req.json()) as { body: string };
     const text = body?.trim();
     if (!text) {
