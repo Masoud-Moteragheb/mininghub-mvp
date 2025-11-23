@@ -2,6 +2,8 @@
 import { prisma } from "@/lib/prisma";
 import CommunityClient from "@/components/CommunityClient";
 
+export const revalidate = 0;
+
 export type CommunityItem = {
   id: string;
   title: string;
