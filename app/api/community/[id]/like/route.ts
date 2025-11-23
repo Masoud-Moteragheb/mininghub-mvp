@@ -2,13 +2,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-type Params = { params: { id: string } };
-
-// POST /api/community/[id]/like  → افزایش لایک
-export async function POST(_req: Request, { params }: Params) {
-  const { id } = params;
-
+// در Next.js 16، context.params یک Promise است
+export async function POST(
+  _req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await context.params;
+
     const updated = await prisma.thread.update({
       where: { id },
       data: {
