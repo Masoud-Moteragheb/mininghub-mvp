@@ -1,11 +1,10 @@
 // app/events/new/page.tsx
 
-
 import { prisma } from "@/lib/prisma";
 import NewEventForm from "@/components/NewEventForm";
 
+// مهم: این صفحه را داینامیک می‌کند تا Prisma در مرحله‌ی build اجرا نشود
 export const dynamic = "force-dynamic";
-
 
 export default async function NewEventPage() {
   const organizations = await prisma.organization.findMany({

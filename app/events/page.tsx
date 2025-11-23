@@ -1,7 +1,10 @@
 // app/events/page.tsx
+
 import { format } from "date-fns";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";  // ← مشکل دقیقاً همین بود!!!
 
 export default async function EventsPage() {
   const allEvents = await prisma.event.findMany({
@@ -34,7 +37,6 @@ export default async function EventsPage() {
           + New Event
         </Link>
       </section>
-
 
       {/* Upcoming */}
       <section>
@@ -100,7 +102,9 @@ export default async function EventsPage() {
 
       {/* Past */}
       <section>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Past events</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          Past events
+        </h2>
 
         {past.length === 0 ? (
           <p className="text-sm text-gray-500">
