@@ -1,6 +1,11 @@
 // app/events/new/page.tsx
+
+
 import { prisma } from "@/lib/prisma";
 import NewEventForm from "@/components/NewEventForm";
+
+export const dynamic = "force-dynamic";
+
 
 export default async function NewEventPage() {
   const organizations = await prisma.organization.findMany({
